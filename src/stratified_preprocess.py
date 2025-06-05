@@ -5,8 +5,13 @@ import torch
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from collections import Counter
-
 from data_reader import load_features_and_annotations_from_file_list, convert_features_annotation_dictionary_to_list, label2id
+
+'''
+It's different from the preprocess.py script in that it performs to
+make sure that the label distribution is preserved in both training and test sets.
+(since test_1 and test_2 have no 'mount' or class idx '2' samples)
+'''
 
 def clean_and_normalize(features):
     features = np.nan_to_num(features, nan=0.0, posinf=0.0, neginf=0.0)

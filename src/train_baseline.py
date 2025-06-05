@@ -88,13 +88,13 @@ def main():
     parser.add_argument('--output', type=str, default='models/baseline_stratified.pth')
     args = parser.parse_args()
 
-    # Load data
+    # load data
     data = torch.load(args.data)
     features, labels = data['features'], data['labels']
     print(f"Loaded data with {features.shape[0]} samples and {features.shape[1]} features")
     unique, counts = torch.unique(labels, return_counts=True)
     print("Label counts:", dict(zip(unique.tolist(), counts.tolist())))
-    # Split into train/val
+    # split into train/val
     train_X, val_X, train_y, val_y = train_test_split(
         features, labels, test_size=0.1, stratify=labels, random_state=42
     )
@@ -103,7 +103,7 @@ def main():
     train_loader = DataLoader(TensorDataset(train_X, train_y), batch_size=32, shuffle=True)
     val_loader = DataLoader(TensorDataset(val_X, val_y), batch_size=64)
 
-    # Setup
+    # setting up
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = ResNetClassifier(input_dim=features.shape[1]).to(device)
     optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-2)
@@ -118,12 +118,12 @@ def main():
         print(f"Epoch {epoch+1}")
         train(model, train_loader, optimizer, criterion, device, writer, epoch)
 
-        # Evaluate on validation set
+        # eval on validation set
         val_acc, val_cm = evaluate(model, val_loader, device)
         print(f"Validation Accuracy: {val_acc:.4f}")
         writer.add_scalar('Val/Accuracy', val_acc, epoch)
 
-        # Early stopping
+        # saviong best val acc
         if val_acc > best_val_acc:
             best_val_acc = val_acc
             patience_counter = 0
@@ -134,7 +134,7 @@ def main():
         #         print("Early stopping")
         #         break
 
-    # Final metrics
+    # final metrics saving
     acc, cm = evaluate(model, val_loader, device)
     print("Final validation accuracy:", acc)
     with open('results/train_metrics.json', 'w') as f:
