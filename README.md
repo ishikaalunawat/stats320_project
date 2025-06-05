@@ -25,11 +25,34 @@ Run to see results in `results/`:
 python src/check_label_dist.py
 ```
 
-## Training
-### ResNet-Features (Baseline with 316 features + Dropout):
-This model uses dropout. Run to see model saved in `models/`, train metrics in `results/` and tensorboard history in `runs/baseline_dropout_stratified`:
+## Models
+You can use any model type: `baseline`, `dropout`, `sparsemax`. Replace the `{model}` tag in the commands below.
+### Training
 ```
-python src/train_baseline.py --data data/processed/data.pt --output models/baseline_dropout_stratified.pth
+python src/train_{model}.py --data data/processed/data.pt --output models/{model}_stratified.pth
 ```
+By default it saves:
+* Model in `models/{model}_stratified.pth`
+* Train/Val metrics in `results/{model}_stratified/train_metrics.json`
 
-### ResNet-SparseMax
+### Evaluation
+```
+python src/evaluate_{model}.py --data data/processed/test.pt --model models/{model}_stratified.pth --output results/{model}_stratified/test_metrics.json
+```
+By default it saves:
+* Test metrics in `results/{model}_stratified/test_metrics.json`
+
+### Visualizations
+#### 1. Loss/Accuracy curves
+Run:
+```
+tensorboard --logdir runs/{model}_stratified
+```
+#### 2. Confusion Matrices
+Run:
+```
+python src/plot_confusion --model {model}_stratified
+```
+By default it saves:
+* Train/Test confusion matrix plots in `results/{model}_stratified`
+
