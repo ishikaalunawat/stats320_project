@@ -11,6 +11,8 @@ def evaluate_model(data_path, model_path, output_path):
     # test data
     data = torch.load(data_path)
     x, y = data['features'], data['labels']
+    unique, counts = torch.unique(y, return_counts=True)
+    print("Label counts:", dict(zip(unique.tolist(), counts.tolist())))
     dataset = TensorDataset(x, y)
     loader = DataLoader(dataset, batch_size=64)
 

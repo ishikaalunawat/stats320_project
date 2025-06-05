@@ -21,9 +21,9 @@ def plot_confusion_matrix(json_path, title='CF', normalize=False):
     plt.ylabel("True")
     plt.title(f"Confusion Matrix (Accuracy: {acc:.2%})")
     plt.tight_layout()
-    plt.savefig(f'results/{title}_confusion_matrix.png')
+    plt.savefig(f'results/confusion_matrix_{title}.png')
     plt.close()
 
 if __name__ == "__main__":
-    plot_confusion_matrix("results/test_metrics.json", 'Test', normalize=True)
-    plot_confusion_matrix("results/baseline_metrics.json", 'Train', normalize=True)
+    plot_confusion_matrix("results/test_metrics.json", 'test', normalize=True)
+    plot_confusion_matrix("results/baseline_metrics.json", 'train', normalize=True)

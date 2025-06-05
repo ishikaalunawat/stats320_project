@@ -1,11 +1,13 @@
 import os
 import glob
 
-RAW_DATA_DIR = "data/raw/test_1"
-OUT_FILE = "data/test_file_list.txt"
-f = open(OUT_FILE, "x")
 
-with open(OUT_FILE, 'w') as f_out:
+RAW_DATA_DIR = "data/raw/test_2"
+OUT_FILE = "data/test_file_list.txt"
+if not os.path.exists(OUT_FILE):
+    f = open(OUT_FILE, "x")
+
+with open(OUT_FILE, 'a') as f_out:
     for session in os.listdir(RAW_DATA_DIR):
         session_dir = os.path.join(RAW_DATA_DIR, session)
         if not os.path.isdir(session_dir):
