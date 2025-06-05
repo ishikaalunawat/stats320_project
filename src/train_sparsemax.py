@@ -53,20 +53,25 @@ class ResNetClassifier(nn.Module):
         return self.sparsemax(self.output_layer(x))  # returns sparse probs
 
 # train - updated for sparsemax outputs
-def train(model, dataloader, optimizer, criterion, device, writer, epoch):
+def train(model, dataloader, optimizer, criterion, device, writer, weights, epoch):
     model.train()
     running_loss = 0.0
     eps = 0.02
     for i, (inputs, labels) in enumerate(dataloader):
         inputs, labels = inputs.to(device), labels.to(device)
-        noise = torch.normal(0, 0.02, size=inputs.shape).to(device)
-        inputs = inputs + noise
+        # noise = torch.normal(0, 0.02, size=inputs.shape).to(device)
+        # inputs = inputs + noise
         optimizer.zero_grad()
         outputs = model(inputs)
         log_sparsemax = torch.log(outputs + 1e-10)
-        # label smoothing
-        target_one_hot = (1 - eps) * torch.nn.functional.one_hot(labels, num_classes=4).float() + eps / 4
-        loss = criterion(log_sparsemax, target_one_hot.to(device))
+        # label smoothing + weighting
+        target_one_hot = torch.nn.functional.one_hot(labels, num_classes=4).float().to(device)
+        # apply per-class weights
+        weighted_targets = target_one_hot * weights  # shape: (batch_size, num_classes)
+        # normalize to ensure it's a proper probability distribution
+        weighted_targets = weighted_targets / (weighted_targets.sum(dim=1, keepdim=True) + 1e-10)
+
+        loss = criterion(log_sparsemax, weighted_targets)
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
@@ -120,7 +125,7 @@ def main():
     writer = SummaryWriter(log_dir='runs/sparsemax_stratified')
 
     best_val_acc = 0
-    patience, patience_counter = 5, 0
+    # patience, patience_counter = 10, 0
 
     for epoch in range(100):
         print(f"Epoch {epoch+1}")
@@ -141,6 +146,7 @@ def main():
         #     if patience_counter >= patience:
         #         print("Early stopping")
         #         break
+
 
     # final metrics
     val_acc, val_cm = evaluate(model, val_loader, device)
