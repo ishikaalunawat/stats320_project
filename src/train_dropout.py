@@ -36,13 +36,17 @@ class ResNetClassifier(nn.Module):
         super().__init__()
         self.input_layer = nn.Linear(input_dim, hidden_dim)
         self.res1 = ResidualBlock(hidden_dim)
+        self.dropout = nn.Dropout(p=0.15)
         self.res2 = ResidualBlock(hidden_dim)
         self.output_layer = nn.Linear(hidden_dim, num_classes)
 
     def forward(self, x):
         x = torch.relu(self.input_layer(x))
+        x = self.dropout(x)
         x = self.res1(x)
+        x = self.dropout(x)
         x = self.res2(x)
+        x = self.dropout(x)
         return self.output_layer(x)
 
 # train
@@ -51,6 +55,8 @@ def train(model, dataloader, optimizer, criterion, device, writer, epoch):
     running_loss = 0.0
     for i, (inputs, labels) in enumerate(dataloader):
         inputs, labels = inputs.to(device), labels.to(device)
+        # noise = torch.normal(0, 0.02, size=inputs.shape).to(device)
+        # inputs = inputs + noise
         optimizer.zero_grad()
         logits = model(inputs)
         loss = criterion(logits, labels)
@@ -80,7 +86,7 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--data', type=str, default='data/processed/data.pt')
-    parser.add_argument('--output', type=str, default='models/baseline_stratified.pth')
+    parser.add_argument('--output', type=str, default='models/dropout_stratified.pth')
     args = parser.parse_args()
 
     # load data
@@ -104,7 +110,7 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-2)
     weights = get_class_weights(train_y, num_classes=4).to(device)
     criterion = nn.CrossEntropyLoss(weight=weights, label_smoothing=0.1)
-    writer = SummaryWriter(log_dir='runs/baseline_stratified')
+    writer = SummaryWriter(log_dir='runs/dropout_stratified')
 
     best_val_acc = 0
     patience, patience_counter = 5, 0
@@ -133,14 +139,14 @@ def main():
     val_acc, val_cm = evaluate(model, val_loader, device)
     train_acc, train_cm = evaluate(model, train_loader, device)
 
-    if not os.path.exists('results/baseline_stratified'):
-        os.makedirs('results/baseline_stratified')
+    if not os.path.exists('results/dropout_stratified'):
+        os.makedirs('results/dropout_stratified')
 
     print("Final validation accuracy:", val_acc)
     print("Final training accuracy:", train_acc)
 
     # save metrics
-    with open('results/baseline_stratified/train_metrics.json', 'w') as f:
+    with open('results/dropout_stratified/train_metrics.json', 'w') as f:
         json.dump({
             'val_accuracy': val_acc,
             'val_confusion_matrix': val_cm,

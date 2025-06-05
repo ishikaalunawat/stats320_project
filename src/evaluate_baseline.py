@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import accuracy_score, confusion_matrix
 import argparse
 import json
-from train_dropout import ResNetClassifier
+from train_baseline import ResNetClassifier
 
 def evaluate_model(data_path, model_path, output_path):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -41,8 +41,8 @@ def evaluate_model(data_path, model_path, output_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--data', type=str, default='data/processed/test.pt')
-    parser.add_argument('--model', type=str,  default='models/dropout_stratified.pth')
-    parser.add_argument('--output', type=str, default='results/dropout_stratified/test_metrics.json')
+    parser.add_argument('--model', type=str,  default='models/baseline_stratified.pth')
+    parser.add_argument('--output', type=str, default='results/baseline_stratified/test_metrics.json')
     args = parser.parse_args()
 
     evaluate_model(args.data, args.model, args.output)

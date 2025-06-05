@@ -2,3 +2,4 @@ data/raw
 data/processed
 models/
 runs/
+src/__pycache__
