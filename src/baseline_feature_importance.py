@@ -83,6 +83,7 @@ if __name__ == "__main__":
     parser.add_argument('--model', type=str,  default='models/baseline_stratified.pth')
     parser.add_argument('--metric', type=str, default='results/baseline_stratified/test_metrics.json')
     parser.add_argument('--output', type=str, default='results/baseline_stratified/feature_importance.json')
+    parser.add_argument('--shuffles', type=int, default=10)
     args = parser.parse_args()
 
-    evaluate_model(args.data, args.model, args.metric, args.output)
+    feature_importance(args.data, args.model, args.metric, args.output, args.shuffles)
