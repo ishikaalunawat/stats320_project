@@ -1,9 +1,10 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score
 import argparse
 import json
 from train_dropout import ResNetClassifier
+import matplotlib.pyplot as plt
 
 names = np.array([b'nose_x', b'nose_y', b'right_ear_x', b'right_ear_y',
                   b'left_ear_x', b'left_ear_y', b'neck_x', b'neck_y',
@@ -92,8 +93,18 @@ def evaluate_model(x, y, model, device):
 
     return acc
 
+def plot_deltas(deltas, plot_path):
+  '''
+  Plot a histogram for the mean drop in accuracy across feature shuffles.
+  '''
+  plt.hist(deltas)
+  plt.xlabel('Mean Drop in Accuracy')
+  plt.ylabel('Number of Features')
+
+  plt.savefig(plot_path)
+
 def feature_importance(data_path, model_path, metric_path, output_path, 
-                       n_shuffles=10):
+                       plot_path, n_shuffles=10):
     '''
     Given feature matrix, shuffle each feature n_shuffles times and measure the
     drop in model accuracy. Take the average across shuffles and compare the
@@ -137,10 +148,12 @@ def feature_importance(data_path, model_path, metric_path, output_path,
 
         mean_deltas[i] = deltas.mean()
 
-    sorted, rankings = mean_deltas.sort(descending=True)[1]
+    sorted, rankings = mean_deltas.sort(descending=True)
         
     with open(output_path, 'w') as f:
         json.dump({'deltas': sorted, 'rankings': names[rankings]}, f)
+
+    plot_deltas(sorted, plot_path)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -148,7 +161,8 @@ if __name__ == "__main__":
     parser.add_argument('--model', type=str,  default='models/dropout_stratified.pth')
     parser.add_argument('--metric', type=str, default='results/dropout_stratified/test_metrics.json')
     parser.add_argument('--output', type=str, default='results/dropout_stratified/feature_importance.json')
+    parser.add_argument('--plot', type=str, default='results/dropout_stratified/feature_importance.png')
     parser.add_argument('--shuffles', type=int, default=10)
     args = parser.parse_args()
 
-    feature_importance(args.data, args.model, args.metric, args.output, args.shuffles)
+    feature_importance(args.data, args.model, args.metric, args.output, args.plot, args.shuffles)
