@@ -144,7 +144,7 @@ def feature_importance(data_path, model_path, metric_path, output_path,
             new_data = x.detach().clone()
             new_data[:, i] = new_data[perm, i]
 
-            deltas[j] = initial_accuracy - evaluate_model(x, y, model, device)
+            deltas[j] = initial_accuracy - evaluate_model(new_data, y, model, device)
 
         mean_deltas[i] = deltas.mean()
 
