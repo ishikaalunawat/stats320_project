@@ -56,3 +56,12 @@ python src/plot_confusion --model {model}_stratified
 By default it saves:
 * Train/Test confusion matrix plots in `results/{model}_stratified`
 
+## Feature Importance
+You can use any model type: `baseline`, `dropout`, `sparsemax`. Replace the `{model}` tag in the commands below.
+Run:
+```
+python src/feature_importance_dropout.py
+```
+By default it saves:
+* Feature Importance (deltas vs. features) in `results/{model}_stratified`
+* Top-K features plot in `results/{model}_stratified`
