@@ -1,3 +1,5 @@
+# Understanding Sparse & Interpretable Representations for Behavioral Classification
+
 ## Data
 ### 1. Generate file lists
 Download .zip data into data/raw/ and unzip it here
@@ -60,7 +62,7 @@ By default it saves:
 You can use any model type: `baseline`, `dropout`, `sparsemax`. Replace the `{model}` tag in the commands below.
 Run:
 ```
-python src/feature_importance_dropout.py
+python src/feature_importance_{model}.py
 ```
 By default it saves:
 * Feature Importance (deltas vs. features) in `results/{model}_stratified`
