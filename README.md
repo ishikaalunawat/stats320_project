@@ -1,5 +1,5 @@
 # Understanding Sparse & Interpretable Representations for Behavioral Classification
-Code repository for STATS 320 Final Project <br>
+Code repository for CS 339N (STATS 320) Final Project <br>
 <img src="data/image-gh-2.png" alt="My visualization" width="500" height="500" />
 
 
